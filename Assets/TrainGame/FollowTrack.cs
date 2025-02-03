@@ -87,6 +87,7 @@ public class FollowTrack : MonoBehaviour
 							//get the next navPoint
 							navPoint = currentTrack.transform.GetChild(nextNavPointIndex);
 							nextNavPointIndex++;
+							lastNavPoint = navPoint;
 							Debug.Log("updating navPoint to " + navPoint);
 						}
 
@@ -129,7 +130,7 @@ public class FollowTrack : MonoBehaviour
 				{
 					Debug.Log("Looking at " + navPoint);
 				}
-				lastNavPoint = navPoint;
+
 
 			}
 			else
@@ -155,10 +156,13 @@ public class FollowTrack : MonoBehaviour
 		Debug.Log("Collision Enter: " + collision.gameObject.name);
 		if (collision.gameObject.CompareTag("railroad-track"))
 		{
-			touchingTracks.Enqueue(collision.gameObject);
-			if (touchingTracks.Count > 1)
+			if (!touchingTracks.Contains(collision.gameObject))
 			{
-				Debug.Log(string.Format("Tracks: {0}, {1}", touchingTracks.Peek(), touchingTracks.ToArray()[1]));
+				touchingTracks.Enqueue(collision.gameObject);
+			}
+			for (short i = 0; i < touchingTracks.Count; i++)
+			{
+				Debug.LogWarning(string.Format("Track {0}: {1}", i, touchingTracks.ToArray()[i]));
 			}
 		}
 	}
@@ -168,7 +172,7 @@ public class FollowTrack : MonoBehaviour
 		Debug.Log("Collision Exit: " + collision.gameObject.name);
 		if (collision.gameObject.CompareTag("railroad-track") && touchingTracks.Contains(collision.gameObject))
 		{
-			//touchingTracks.Dequeue();
+			touchingTracks.Dequeue();
 		}
 	}
 
