@@ -13,10 +13,14 @@ public class FollowTrack : MonoBehaviour
 	Transform navPoint = null;
 
 	Vector3 tempPos;
-	float speed = 0.1f;
+	readonly float MAX_SPEED = 0.25f;
+	float speed = 0f;
 	int nextNavPointIndex = 0;
 	int navPointCount = 0;
 	GameObject currentTrack = null;
+
+	bool moving = false;
+	bool stopping = false;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -26,10 +30,35 @@ public class FollowTrack : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		tempPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-
 		if (Input.GetKey(KeyCode.Z)) //means moving forward
 		{
+			moving = true;
+		}
+		else if (Input.GetKey(KeyCode.X))
+		{
+			stopping = true;
+		}
+
+		tempPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+
+		if (moving) //means moving forward
+		{
+			if (stopping)
+			{
+				if (speed > 0f)
+				{
+					speed -= 0.01f;
+				}
+				else
+				{
+					moving = false;
+					stopping = false;
+				}
+			}
+			else if (speed < MAX_SPEED)
+			{
+				speed += 0.001f;
+			}
 			Vector3 move = new Vector3(0, 0, 0 + speed); // start from moving to the right
 			transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
 
@@ -143,12 +172,17 @@ public class FollowTrack : MonoBehaviour
 				transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z);
 			}
 		}
+
+		/*
+		 * no moving backwards right now
+		 * we don't have the technology
 		else if (Input.GetKey(KeyCode.X))
 		{
 			Vector3 move = new Vector3(0, 0, 0 - speed); // start from moving to the left
 			move = transform.TransformDirection(move);
 			transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
 		}
+		*/
 	}
 
 	private void OnCollisionEnter(Collision collision)
