@@ -124,7 +124,6 @@ public class FollowTrack : MonoBehaviour
 					catch (UnityException ue)
 					{
 						Debug.Log(ue);
-						//return;
 					}
 					transform.LookAt(navPoint);
 				}
