@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FollowTrack : MonoBehaviour
 {
-	Queue<GameObject> touchingTracks = new Queue<GameObject>();
+	ArrayList touchingTracks = new ArrayList();
 
 	private Quaternion tempRotRaw;
 	private Vector3 tempRot;
@@ -64,7 +64,7 @@ public class FollowTrack : MonoBehaviour
 
 			if (currentTrack == null && touchingTracks.Count > 0)
 			{
-				currentTrack = touchingTracks.Peek();
+				currentTrack = (GameObject)touchingTracks[0];
 				navPointCount = currentTrack.gameObject.transform.childCount;
 				Debug.Log("Track children: " + navPointCount);
 			}
@@ -98,7 +98,7 @@ public class FollowTrack : MonoBehaviour
 								//if so, discard it and look at the next one
 								Debug.LogWarning(string.Format("2: index at {0} of count {1}", nextNavPointIndex, navPointCount));
 								Debug.LogWarning("discarding current track");
-								currentTrack = touchingTracks.ToArray()[1];
+								currentTrack = (GameObject)touchingTracks[1];
 								navPointCount = currentTrack.gameObject.transform.childCount;
 								Debug.Log("New track children: " + navPointCount);
 								nextNavPointIndex = 0;
@@ -191,7 +191,7 @@ public class FollowTrack : MonoBehaviour
 		{
 			if (!touchingTracks.Contains(collision.gameObject))
 			{
-				touchingTracks.Enqueue(collision.gameObject);
+				touchingTracks.Insert(touchingTracks.Count, collision.gameObject);
 			}
 			for (short i = 0; i < touchingTracks.Count; i++)
 			{
@@ -205,7 +205,7 @@ public class FollowTrack : MonoBehaviour
 		Debug.Log("Collision Exit: " + collision.gameObject.name);
 		if (collision.gameObject.CompareTag("railroad-track") && touchingTracks.Contains(collision.gameObject))
 		{
-			touchingTracks.Dequeue();
+			touchingTracks.Remove(collision.gameObject);
 		}
 	}
 
