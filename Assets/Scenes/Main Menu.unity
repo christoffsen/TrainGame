@@ -210,6 +210,7 @@ GameObject:
   - component: {fileID: 376890110}
   - component: {fileID: 376890109}
   - component: {fileID: 376890108}
+  - component: {fileID: 376890111}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -282,6 +283,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &376890111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376890107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 320ea8e7ad55f7d4dab3dec705362bee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &380557048
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,7 +376,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 380557051}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 376890111}
+        m_MethodName: StartNewGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &380557051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,6 +436,7 @@ GameObject:
   - component: {fileID: 488512352}
   - component: {fileID: 488512354}
   - component: {fileID: 488512353}
+  - component: {fileID: 488512355}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -479,6 +504,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 488512351}
   m_CullTransparentMesh: 0
+--- !u!114 &488512355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488512351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 320ea8e7ad55f7d4dab3dec705362bee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &707563141
 GameObject:
   m_ObjectHideFlags: 0
@@ -1188,7 +1225,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2001253662}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 376890111}
+        m_MethodName: ExitGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2001253662
 MonoBehaviour:
   m_ObjectHideFlags: 0
