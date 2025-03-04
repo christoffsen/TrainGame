@@ -6,6 +6,7 @@ TagManager:
   tags:
   - railroad-track
   - pause-menu
+  - nav-point
   layers:
   - Default
   - TransparentFX
