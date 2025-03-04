@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FollowTrack : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class FollowTrack : MonoBehaviour
 
 	bool moving = false;
 	bool stopping = false;
+
+	bool paused = false;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -30,158 +33,171 @@ public class FollowTrack : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (Input.GetKey(KeyCode.Z)) //means moving forward
+		if (!paused)
 		{
-			moving = true;
-		}
-		else if (Input.GetKey(KeyCode.X))
-		{
-			stopping = true;
-		}
-
-		tempPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-
-		if (moving) //means moving forward
-		{
-			if (stopping)
+			if (Input.GetKey(KeyCode.Z)) //means moving forward
 			{
-				if (speed > 0f)
-				{
-					speed -= 0.01f;
-				}
-				else
-				{
-					moving = false;
-					stopping = false;
-				}
+				moving = true;
 			}
-			else if (speed < MAX_SPEED)
+			else if (Input.GetKey(KeyCode.X))
 			{
-				speed += 0.001f;
+				stopping = true;
 			}
-			Vector3 move = new Vector3(0, 0, 0 + speed); // start from moving to the right
-			transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
+			else if (Input.GetKeyUp(KeyCode.Space))
+			{
+				Pause();
+				return;
+			}
 
-			if (currentTrack == null && touchingTracks.Count > 0)
+			tempPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+
+			if (moving) //means moving forward
 			{
-				currentTrack = (GameObject)touchingTracks[0];
-				navPointCount = currentTrack.gameObject.transform.childCount;
-				Debug.Log("Track children: " + navPointCount);
-			}
-			if (currentTrack != null && navPointCount > 0)
-			{
-				//go to next navPoint
-				//when we touch a navPoint, go to the next one
-				//Transform navPoint = null;
-				/*
-                if (navPointIndex >= navPointCount //if there's no next navPoint
-                   || lastNavPoint.position == navPoint.position)
-                {
-                    // just keep going
-                    Debug.Log("same point: " + navPoint);
-                }*/
-				if (lastNavPoint != null)
+				if (stopping)
 				{
-					//Debug.LogWarning("lastNavPoint: " + lastNavPoint.transform.position);
-					//Debug.LogWarning("bus: " + tempPos);
-				}
-				if (navPoint == null
-					|| (IsTouching(tempPos, lastNavPoint.transform.position, 1.0f))) //if we're starting the first nav point of the track, or if we're touching the last navPoint we were looking at
-				{
-					try
+					if (speed > 0f)
 					{
-						Debug.LogWarning(string.Format("1: index at {0} of count {1}", nextNavPointIndex, navPointCount));
-						if (nextNavPointIndex > navPointCount - 1) //check if we're at the end of the current track
+						speed -= 0.01f;
+					}
+					else
+					{
+						moving = false;
+						stopping = false;
+					}
+				}
+				else if (speed < MAX_SPEED)
+				{
+					speed += 0.001f;
+				}
+				Vector3 move = new Vector3(0, 0, 0 + speed); // start from moving to the right
+				transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
+
+				if (currentTrack == null && touchingTracks.Count > 0)
+				{
+					currentTrack = (GameObject)touchingTracks[0];
+					navPointCount = currentTrack.gameObject.transform.childCount;
+					Debug.Log("Track children: " + navPointCount);
+				}
+				if (currentTrack != null && navPointCount > 0)
+				{
+					//go to next navPoint
+					//when we touch a navPoint, go to the next one
+					//Transform navPoint = null;
+					/*
+					if (navPointIndex >= navPointCount //if there's no next navPoint
+					   || lastNavPoint.position == navPoint.position)
+					{
+						// just keep going
+						Debug.Log("same point: " + navPoint);
+					}*/
+					if (lastNavPoint != null)
+					{
+						//Debug.LogWarning("lastNavPoint: " + lastNavPoint.transform.position);
+						//Debug.LogWarning("bus: " + tempPos);
+					}
+					if (navPoint == null
+						|| (IsTouching(tempPos, lastNavPoint.transform.position, 1.0f))) //if we're starting the first nav point of the track, or if we're touching the last navPoint we were looking at
+					{
+						try
 						{
-							if (touchingTracks.Count > 1) //and make sure we have a new track to go to
+							Debug.LogWarning(string.Format("1: index at {0} of count {1}", nextNavPointIndex, navPointCount));
+							if (nextNavPointIndex > navPointCount - 1) //check if we're at the end of the current track
 							{
-								//if so, discard it and look at the next one
-								Debug.LogWarning(string.Format("2: index at {0} of count {1}", nextNavPointIndex, navPointCount));
-								Debug.LogWarning("discarding current track");
-								currentTrack = (GameObject)touchingTracks[1];
-								navPointCount = currentTrack.gameObject.transform.childCount;
-								Debug.Log("New track children: " + navPointCount);
-								nextNavPointIndex = 0;
-								navPoint = null;
-								lastNavPoint = null;
-								return; //exit early to move on to the next track
+								if (touchingTracks.Count > 1) //and make sure we have a new track to go to
+								{
+									//if so, discard it and look at the next one
+									Debug.LogWarning(string.Format("2: index at {0} of count {1}", nextNavPointIndex, navPointCount));
+									Debug.LogWarning("discarding current track");
+									currentTrack = (GameObject)touchingTracks[1];
+									navPointCount = currentTrack.gameObject.transform.childCount;
+									Debug.Log("New track children: " + navPointCount);
+									nextNavPointIndex = 0;
+									navPoint = null;
+									lastNavPoint = null;
+									return; //exit early to move on to the next track
+								}
+								else
+								{
+									//do nothing - keep the same navPoint
+								}
 							}
 							else
 							{
-								//do nothing - keep the same navPoint
+								//get the next navPoint
+								navPoint = currentTrack.transform.GetChild(nextNavPointIndex);
+								nextNavPointIndex++;
+								lastNavPoint = navPoint;
+								Debug.Log("updating navPoint to " + navPoint);
 							}
+
 						}
-						else
+						catch (UnityException ue)
 						{
-							//get the next navPoint
-							navPoint = currentTrack.transform.GetChild(nextNavPointIndex);
-							nextNavPointIndex++;
-							lastNavPoint = navPoint;
-							Debug.Log("updating navPoint to " + navPoint);
+							Debug.Log(ue);
 						}
+						transform.LookAt(navPoint);
+					}
+					/*
+					else if(IsBetween(tempPos, lastNavPoint.transform.position, navPoint.transform.position, 0.1f)) {// if we're still on the same nav point
 
 					}
-					catch (UnityException ue)
+
+					else //we need to move to the next point
 					{
-						Debug.Log(ue);
+						Debug.LogWarning("not between");
+						Debug.LogWarning(string.Format("tempPos: {0}, lastNavPoint.transform.position: {1}, navPoint.transform.position: {2}", tempPos, lastNavPoint.transform.position, navPoint.transform.position));
 					}
-					transform.LookAt(navPoint);
-				}
-				/*
-                else if(IsBetween(tempPos, lastNavPoint.transform.position, navPoint.transform.position, 0.1f)) {// if we're still on the same nav point
-
-                }
-
-                else //we need to move to the next point
-                {
-                    Debug.LogWarning("not between");
-                    Debug.LogWarning(string.Format("tempPos: {0}, lastNavPoint.transform.position: {1}, navPoint.transform.position: {2}", tempPos, lastNavPoint.transform.position, navPoint.transform.position));
-                }
-                */
-				move = transform.TransformDirection(move);
-				transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
-																										 //move *= speed;
+					*/
+					move = transform.TransformDirection(move);
+					transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
+																											 //move *= speed;
 
 
-				//transform.position = new Vector3(nextNavPoint.transform.position.x, tempPos.y, nextNavPoint.transform.position.z);
-				tempRot = transform.rotation.eulerAngles;
-				tempRotRaw = transform.rotation;
+					//transform.position = new Vector3(nextNavPoint.transform.position.x, tempPos.y, nextNavPoint.transform.position.z);
+					tempRot = transform.rotation.eulerAngles;
+					tempRotRaw = transform.rotation;
 
 
-				tempRotRaw.eulerAngles = tempRot;
-				transform.rotation = tempRotRaw;
-				if (navPoint == null)
-				{
-					Debug.Log("Looking at null navPoint!");
+					tempRotRaw.eulerAngles = tempRot;
+					transform.rotation = tempRotRaw;
+					if (navPoint == null)
+					{
+						Debug.Log("Looking at null navPoint!");
+					}
+					else
+					{
+						Debug.Log("Looking at " + navPoint);
+					}
+
+
 				}
 				else
 				{
-					Debug.Log("Looking at " + navPoint);
+					//transform.position = new Vector3(tempPos.x, tempPos.y, tempPos.z + speed);
+					//Vector3 move = new Vector3(0, 0, 0 + speed);
+					//Debug.Log("move: " + move);
+					move = transform.TransformDirection(move);
+					//move *= speed;
+					transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z);
 				}
-
-
 			}
-			else
+
+			/*
+			 * no moving backwards right now
+			 * we don't have the technology
+			else if (Input.GetKey(KeyCode.X))
 			{
-				//transform.position = new Vector3(tempPos.x, tempPos.y, tempPos.z + speed);
-				//Vector3 move = new Vector3(0, 0, 0 + speed);
-				//Debug.Log("move: " + move);
+				Vector3 move = new Vector3(0, 0, 0 - speed); // start from moving to the left
 				move = transform.TransformDirection(move);
-				//move *= speed;
-				transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z);
+				transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
 			}
+			*/
 		}
-
-		/*
-		 * no moving backwards right now
-		 * we don't have the technology
-		else if (Input.GetKey(KeyCode.X))
+		//unpause if Esc is pressed again
+		else if (Input.GetKeyUp(KeyCode.Space))
 		{
-			Vector3 move = new Vector3(0, 0, 0 - speed); // start from moving to the left
-			move = transform.TransformDirection(move);
-			transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
+			Unpause();
 		}
-		*/
 	}
 
 	private void OnCollisionEnter(Collision collision)
@@ -227,5 +243,33 @@ public class FollowTrack : MonoBehaviour
 			   //&& Math.Abs(position1.y - position2.y) <= tolerance
 			   && Math.Abs(position1.z - position2.z) <= tolerance;
 
+	}
+
+	public void Pause() {
+		paused = true;
+		GameObject canvas = GameObject.FindWithTag("pause-menu");
+		for(int i = 0; i < canvas.transform.childCount; i++)
+		{
+			GameObject button = canvas.transform.GetChild(i).gameObject;
+			button.SetActive(true);
+		}
+		//canvas.SetActive(false);
+	}
+	
+	public void Unpause()
+	{
+		paused = false;
+		GameObject canvas = GameObject.FindWithTag("pause-menu");
+		for (int i = 0; i < canvas.transform.childCount; i++)
+		{
+			GameObject button = canvas.transform.GetChild(i).gameObject;
+			button.SetActive(false);
+		}
+		//canvas.SetActive(true);
+	}
+
+	public void QuitToMenu()
+	{
+		SceneManager.LoadSceneAsync(0);
 	}
 }
