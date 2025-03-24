@@ -14,7 +14,7 @@ public class FollowTrack : MonoBehaviour
 	Transform navPoint = null;
 
 	Vector3 tempPos;
-	readonly float MAX_SPEED = 0.25f;
+	readonly float MAX_SPEED = 0.30f;
 	float speed = 0f;
 	int nextNavPointIndex = 0;
 	int navPointCount = 0;
@@ -80,21 +80,6 @@ public class FollowTrack : MonoBehaviour
 				}
 				if (currentTrack != null && navPointCount > 0)
 				{
-					//go to next navPoint
-					//when we touch a navPoint, go to the next one
-					//Transform navPoint = null;
-					/*
-					if (navPointIndex >= navPointCount //if there's no next navPoint
-					   || lastNavPoint.position == navPoint.position)
-					{
-						// just keep going
-						Debug.Log("same point: " + navPoint);
-					}*/
-					if (lastNavPoint != null)
-					{
-						//Debug.LogWarning("lastNavPoint: " + lastNavPoint.transform.position);
-						//Debug.LogWarning("bus: " + tempPos);
-					}
 					if (navPoint == null
 						|| (IsTouching(tempPos, lastNavPoint.transform.position, 1.0f))) //if we're starting the first nav point of the track, or if we're touching the last navPoint we were looking at
 					{
@@ -137,23 +122,10 @@ public class FollowTrack : MonoBehaviour
 						}
 						transform.LookAt(navPoint);
 					}
-					/*
-					else if(IsBetween(tempPos, lastNavPoint.transform.position, navPoint.transform.position, 0.1f)) {// if we're still on the same nav point
-
-					}
-
-					else //we need to move to the next point
-					{
-						Debug.LogWarning("not between");
-						Debug.LogWarning(string.Format("tempPos: {0}, lastNavPoint.transform.position: {1}, navPoint.transform.position: {2}", tempPos, lastNavPoint.transform.position, navPoint.transform.position));
-					}
-					*/
 					move = transform.TransformDirection(move);
 					transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
-																											 //move *= speed;
 
 
-					//transform.position = new Vector3(nextNavPoint.transform.position.x, tempPos.y, nextNavPoint.transform.position.z);
 					tempRot = transform.rotation.eulerAngles;
 					tempRotRaw = transform.rotation;
 
@@ -173,11 +145,7 @@ public class FollowTrack : MonoBehaviour
 				}
 				else
 				{
-					//transform.position = new Vector3(tempPos.x, tempPos.y, tempPos.z + speed);
-					//Vector3 move = new Vector3(0, 0, 0 + speed);
-					//Debug.Log("move: " + move);
 					move = transform.TransformDirection(move);
-					//move *= speed;
 					transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z);
 				}
 			}
@@ -185,13 +153,7 @@ public class FollowTrack : MonoBehaviour
 			/*
 			 * no moving backwards right now
 			 * we don't have the technology
-			else if (Input.GetKey(KeyCode.X))
-			{
-				Vector3 move = new Vector3(0, 0, 0 - speed); // start from moving to the left
-				move = transform.TransformDirection(move);
-				transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z); // add move to position
-			}
-			*/
+			 */
 		}
 		//unpause if Esc is pressed again
 		else if (Input.GetKeyUp(KeyCode.Space))
@@ -240,7 +202,6 @@ public class FollowTrack : MonoBehaviour
 	private bool IsTouching(Vector3 position1, Vector3 position2, float tolerance = 0.5f)
 	{
 		return Math.Abs(position1.x - position2.x) <= tolerance
-			   //&& Math.Abs(position1.y - position2.y) <= tolerance
 			   && Math.Abs(position1.z - position2.z) <= tolerance;
 
 	}
@@ -253,7 +214,6 @@ public class FollowTrack : MonoBehaviour
 			GameObject button = canvas.transform.GetChild(i).gameObject;
 			button.SetActive(true);
 		}
-		//canvas.SetActive(false);
 	}
 	
 	public void Unpause()
@@ -265,7 +225,6 @@ public class FollowTrack : MonoBehaviour
 			GameObject button = canvas.transform.GetChild(i).gameObject;
 			button.SetActive(false);
 		}
-		//canvas.SetActive(true);
 	}
 
 	public void QuitToMenu()

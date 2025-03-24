@@ -59,9 +59,8 @@ public class MoveCamera : MonoBehaviour
             tempRotRaw.eulerAngles = tempRot;
         }
         Vector3 move = new Vector3(0 + rightMove - leftMove, 0, 0 + forwardMove - backwardMove);
-        //Debug.Log("move: " + move);
         move = transform.TransformDirection(move);
-        //move *= speed;
+        
         transform.position = new Vector3(tempPos.x + move.x, tempPos.y + 0, tempPos.z + move.z);
         transform.rotation = tempRotRaw;
     }
